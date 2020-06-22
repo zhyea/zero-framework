@@ -1,5 +1,5 @@
 <?php
-defined('_ZERO_PATH_') OR exit('You shall not pass!');
+defined('_ZERO_PATH_') or exit('You shall not pass!');
 
 
 if (!function_exists('is_https')) {
@@ -71,8 +71,12 @@ if (!function_exists('error_503')) {
      */
     function error_503()
     {
-        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-        echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: ' . SELF;
+        if (array_key_exists('503', _R_) && !empty(_R_['503'])) {
+            redirect_in_site(_R_['503']);
+        } else {
+            header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+            echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: ' . SELF;
+        }
         exit(3); // EXIT_CONFIG
     }
 }
@@ -89,8 +93,8 @@ if (!function_exists('app_path')) {
     {
         if (is_dir($app_folder)) {
             $app_folder = real_path($app_folder);
-        } elseif (is_dir(_ROOT_DIR__ . $app_folder . DIRECTORY_SEPARATOR)) {
-            $app_folder = append_child_path(_ROOT_DIR__, $app_folder);
+        } elseif (is_dir(_ROOT_DIR_ . $app_folder . DIRECTORY_SEPARATOR)) {
+            $app_folder = append_child_path(_ROOT_DIR_, $app_folder);
         } else {
             error_503();
         }
@@ -130,6 +134,19 @@ if (!function_exists('view_path')) {
 }
 
 
+if (!function_exists('require_app_file')) {
+    /**
+     * add app file
+     *
+     * @param $app_file string app file
+     */
+    function require_app_file($app_file)
+    {
+        require_once _APP_PATH_ . $app_file . '.php';
+    }
+}
+
+
 if (!function_exists('require_model')) {
     /**
      * add model class page
@@ -138,10 +155,58 @@ if (!function_exists('require_model')) {
      */
     function require_model($model_class)
     {
-        require_once _APP_PATH_ . '/model/' . $model_class . '.php';
+        require_app_file('model/' . $model_class);
     }
 }
 
+
+if (!function_exists('require_service')) {
+    /**
+     * add service class page
+     *
+     * @param $service_class string service class page
+     */
+    function require_service($service_class)
+    {
+        require_app_file('service/' . $service_class);
+    }
+}
+
+
+if (!function_exists('require_by_dir')) {
+    /**
+     * add all php files in target dir
+     *
+     * @param $dir string target directory
+     */
+    function require_by_dir($dir)
+    {
+        $files = get_files($dir, true);
+        foreach ($files as $f) {
+            if (str_end_with($f, '.php')) {
+                require $f;
+            }
+        }
+    }
+}
+
+
+if (!function_exists('require_once_by_dir')) {
+    /**
+     * add all php files in target dir
+     *
+     * @param $dir string target directory
+     */
+    function require_once_by_dir($dir)
+    {
+        $files = get_files($dir, true);
+        foreach ($files as $f) {
+            if (str_end_with($f, '.php')) {
+                require_once $f;
+            }
+        }
+    }
+}
 
 /**
  * define site url
@@ -155,7 +220,8 @@ $app_folder = app_path($app_folder);
 
 define('_APP_PATH_', $app_folder);
 
-define('_CONTROLLER_PATH_', $app_folder . '/controller/');
+define('_CONTROLLER_PATH_', $app_folder . 'controller' . DIRECTORY_SEPARATOR);
+
 
 /**
  * define view path
@@ -164,17 +230,37 @@ $view_folder = view_path($view_folder);
 
 define('_VIEW_PATH_', $view_folder);
 
+
 /**
  * define router
  */
-require_once _APP_PATH_ . '/config/routes.php';
-
+require_once _APP_PATH_ . 'config' . DIRECTORY_SEPARATOR . 'routes' . '.php';
+uksort($routes, 'str_len_cmp');
 define('_R_', $routes);
 
 
 /**
  * define db config
  */
-require_once _APP_PATH_ . '/config/database.php';
-
+require_once _APP_PATH_ . 'config' . DIRECTORY_SEPARATOR . 'database' . '.php';
 define('_DB_', $db[$active_group]);
+
+
+/**
+ * define common config
+ */
+require_once _ZERO_PATH_ . 'config' . DIRECTORY_SEPARATOR . 'config' . '.php';
+require_once _ZERO_PATH_ . 'config' . DIRECTORY_SEPARATOR . 'hooks' . '.php';
+require_once _APP_PATH_ . 'config' . DIRECTORY_SEPARATOR . 'config' . '.php';
+require_once _APP_PATH_ . 'config' . DIRECTORY_SEPARATOR . 'hooks' . '.php';
+define('_CFG_', $config);
+
+/**
+ * define upload path
+ */
+define('_UPLOAD_PATH_', _VIEW_PATH_ . DIRECTORY_SEPARATOR . 'upload');
+
+if (!is_dir(_UPLOAD_PATH_)) {
+    mkdir(_UPLOAD_PATH_, 0777, true);
+}
+
