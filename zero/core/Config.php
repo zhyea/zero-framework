@@ -77,6 +77,7 @@ if (!function_exists('error_503')) {
             header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
             echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: ' . SELF;
         }
+        http_response_code(503);
         exit(3); // EXIT_CONFIG
     }
 }
@@ -264,3 +265,7 @@ if (!is_dir(_UPLOAD_PATH_)) {
     mkdir(_UPLOAD_PATH_, 0777, true);
 }
 
+
+if (!empty(_CFG_['time_zone'])) {
+    date_default_timezone_set('Asia/Shanghai');
+}

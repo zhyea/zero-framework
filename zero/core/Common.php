@@ -227,6 +227,23 @@ if (!function_exists('array_copy')) {
     }
 }
 
+if (!function_exists('array_value_of')) {
+    /**
+     * read value from array by key
+     * @param $key mixed key
+     * @param $array array source array
+     * @param $default mixed default value
+     * @return mixed the value
+     */
+    function array_value_of($key, $array, $default = NULL)
+    {
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        }
+        return $default;
+    }
+}
+
 
 if (!function_exists('build_tree')) {
 

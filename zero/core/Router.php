@@ -45,7 +45,7 @@ class Router
     public function dispatch()
     {
         if (null == $this->controller_config) {
-            error_404();
+            error_404_pag();
         } else {
             $class = $this->controller_config[1];
             $method = $this->controller_config[2];
@@ -54,14 +54,14 @@ class Router
             try {
                 $c = new ReflectionClass($class);
                 if (!$c->hasMethod($method)) {
-                    error_404();
+                    error_404_pag();
                 }
 
                 $i = $c->newInstanceArgs();
                 $m = $c->getmethod($method);
                 $m->invokeArgs($i, $args);
             } catch (ReflectionException $e) {
-                error_500();
+                error_500_page();
             }
         }
     }
