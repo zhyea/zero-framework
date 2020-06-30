@@ -3,6 +3,71 @@
 defined('_ZERO_PATH_') or exit('You shall not pass!');
 
 
+if (!function_exists('is_https')) {
+    /**
+     * Is HTTPS?
+     *
+     * Determines if the application is accessed via an encrypted (HTTPS) connection.
+     *
+     * @return    bool
+     */
+    function is_https()
+    {
+        if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
+            return TRUE;
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+            return TRUE;
+        } elseif (!empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off') {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+}
+
+
+if (!function_exists('site_url')) {
+    /**
+     * Get site url
+     *
+     * @param string $context the context or namespace of the site
+     * @return string
+     */
+    function site_url($context = '')
+    {
+        $base_url = 'localhost';
+
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $base_url = $_SERVER['HTTP_HOST'];
+        } elseif (isset($_SERVER['SERVER_ADDR'])) {
+            if (strpos($_SERVER['SERVER_ADDR'], ':') !== FALSE) {
+                $base_url = '[' . $_SERVER['SERVER_ADDR'] . ']';
+            } else {
+                $base_url = $_SERVER['SERVER_ADDR'];
+            }
+        }
+
+        $server_port = 80;
+        if (isset($_SERVER['SERVER_PORT'])) {
+            $server_port = $_SERVER['SERVER_PORT'];
+        }
+
+        if (empty($context)) {
+            $script_name = $_SERVER['SCRIPT_NAME'];
+            $context = substr($script_name, 0, strpos($script_name, basename($script_name)));
+        } else {
+            $context = '/' . $context . '/';
+        }
+
+        $base_url = (is_https() ? 'https' : 'http') . '://' . $base_url
+            . ($server_port == 80 ? '' : ':' . $server_port)
+            . $context;
+
+        return $base_url;
+    }
+}
+
+
 if (!function_exists('redirect')) {
     /**
      * Header Redirect

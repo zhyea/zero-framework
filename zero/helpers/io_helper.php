@@ -50,11 +50,11 @@ AddDefaultCharset utf-8
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteBase /{ctx}/
+RewriteBase {ctx}/
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /{ctx}/index.php [L]
+RewriteRule . {ctx}/index.php [L]
 </IfModule>
 # END Buffalo';
 

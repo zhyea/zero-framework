@@ -102,7 +102,7 @@ abstract class Z_Model
      * @param $params array 查询参数
      * @return array 查询结果
      */
-    protected function _find($sql, $params)
+    protected function _find($sql, $params = array())
     {
         $dbh = $this->_conn();
         $stmt = $dbh->prepare($sql);
@@ -387,7 +387,7 @@ abstract class Z_Model
         $stmt = $dbh->prepare($sql);
         $r = $stmt->execute($params);
         if (!$r) {
-            echo $stmt->errorCode() . ':' .  $stmt->errorInfo();
+            echo $stmt->errorCode() . ':' . $stmt->errorInfo();
         }
         $dbh = null;
         return $r;

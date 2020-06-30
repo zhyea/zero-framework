@@ -2,69 +2,6 @@
 defined('_ZERO_PATH_') or exit('You shall not pass!');
 
 
-if (!function_exists('is_https')) {
-    /**
-     * Is HTTPS?
-     *
-     * Determines if the application is accessed via an encrypted (HTTPS) connection.
-     *
-     * @return    bool
-     */
-    function is_https()
-    {
-        if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
-            return TRUE;
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
-            return TRUE;
-        } elseif (!empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off') {
-            return TRUE;
-        }
-
-        return FALSE;
-    }
-}
-
-
-if (!function_exists('site_url')) {
-    /**
-     * Get site url
-     *
-     * @param string $context the context or namespace of the site
-     * @return string
-     */
-    function site_url($context = '')
-    {
-        if (isset($_SERVER['SERVER_ADDR'])) {
-            if (strpos($_SERVER['SERVER_ADDR'], ':') !== FALSE) {
-                $server_addr = '[' . $_SERVER['SERVER_ADDR'] . ']';
-            } else {
-                $server_addr = $_SERVER['SERVER_ADDR'];
-            }
-
-            $server_port = 80;
-            if (isset($_SERVER['SERVER_PORT'])) {
-                $server_port = $_SERVER['SERVER_PORT'];
-            }
-
-            if (empty($context)) {
-                $script_name = $_SERVER['SCRIPT_NAME'];
-                $context = substr($script_name, 0, strpos($script_name, basename($script_name)));
-            } else {
-                $context = '/' . $context . '/';
-            }
-
-            $base_url = (is_https() ? 'https' : 'http') . '://' . $server_addr
-                . ($server_port == 80 ? '' : ':' . $server_port)
-                . $context;
-        } else {
-            $base_url = 'http://localhost/';
-        }
-
-        return $base_url;
-    }
-}
-
-
 if (!function_exists('error_503')) {
     /**
      * handle 503 error
@@ -208,11 +145,6 @@ if (!function_exists('require_once_by_dir')) {
         }
     }
 }
-
-/**
- * define site url
- */
-define('_SITE_URL_', site_url());
 
 /**
  * define app path and controller path
